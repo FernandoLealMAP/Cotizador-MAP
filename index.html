@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cotizador MAP Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #F5F3EF;
+    --surface: #FFFFFF;
+    --surface2: #EEEBE5;
+    --border: rgba(0,0,0,.10);
+    --border2: rgba(0,0,0,.18);
+    --text: #1A1916;
+    --text2: #6B6860;
+    --text3: #9B9890;
+    --accent: #1A3C34;
+    --accent-light: #E8F0EE;
+    --accent-text: #0F2820;
+    --danger: #C0392B;
+    --danger-light: #FDECEA;
+    --success: #1E6B45;
+    --success-light: #E8F5ED;
+    --warning: #8B5E0A;
+    --warning-light: #FDF3E3;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; }
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: block; }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--accent);
+    color: #fff;
+    padding: .85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 500; letter-spacing: .01em; }
+  .topbar .logo-sub { font-size: 11px; opacity: .65; font-family: 'DM Mono', monospace; }
+  .topbar-actions { display: flex; gap: 6px; align-items: center; }
+  .icon-btn { background: rgba(255,255,255,.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+  .icon-btn:active { transform: scale(.95); }
+  .badge { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 20px; background: rgba(255,255,255,.2); color: #fff; letter-spacing: .04em; text-transform: uppercase; }
+  .badge.admin-badge { background: var(--warning-light); color: var(--warning); }
+
+  /* CONTENT */
+  .content { padding: 1rem; max-width: 480px; margin: 0 auto; }
+
+  /* CARDS */
+  .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 1rem 1.1rem; margin-bottom: .75rem; box-shadow: var(--shadow); }
+  .card-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .75rem; }
+
+  /* FORM */
+  label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; margin-top: 12px; font-weight: 500; }
+  label:first-child { margin-top: 0; }
+  input, select, textarea {
+    width: 100%; padding: 9px 11px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    background: var(--surface); color: var(--text);
+    outline: none; transition: border-color .15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 60px; }
+
+  /* BUTTONS */
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+    background: var(--surface); color: var(--text);
+    cursor: pointer; margin-top: 8px; transition: all .15s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-text); }
+  .btn.danger { background: var(--danger-light); color: var(--danger); border-color: transparent; }
+  .btn.success { background: var(--success-light); color: var(--success); border-color: transparent; }
+  .btn.ghost { background: transparent; border-color: transparent; color: var(--text2); }
+
+  /* LOGIN */
+  .login-hero {
+    background: var(--accent);
+    padding: 3rem 1.5rem 2rem;
+    text-align: center;
+    color: #fff;
+  }
+  .login-hero .brand { font-size: 28px; font-weight: 600; letter-spacing: -.01em; }
+  .login-hero .sub { font-size: 13px; opacity: .65; margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .login-hero .logo-circle {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    margin: 0 auto 1rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .login-form { padding: 1.5rem 1rem; max-width: 380px; margin: 0 auto; }
+
+  /* ITEMS LIST */
+  .item-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: .7rem .9rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: .45rem;
+    box-shadow: var(--shadow);
+  }
+  .item-thumb {
+    width: 50px; height: 50px; border-radius: 8px;
+    overflow: hidden; flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-qty { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .item-del { background: none; border: none; color: var(--danger); cursor: pointer; padding: 6px; font-size: 18px; flex-shrink: 0; }
+
+  /* TOTAL BAR */
+  .total-bar {
+    background: var(--accent);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    display: flex; justify-content: space-between; align-items: center;
+    margin: .75rem 0;
+    color: #fff;
+  }
+  .total-bar .tl { font-size: 12px; opacity: .75; }
+  .total-bar .ta { font-size: 24px; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text3); }
+  .empty i { font-size: 36px; display: block; margin-bottom: .75rem; }
+  .empty p { font-size: 14px; }
+
+  /* NAV TABS */
+  .nav-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: var(--radius-sm); padding: 3px; margin-bottom: 1rem; }
+  .nav-tab {
+    flex: 1; padding: 7px; border: none;
+    border-radius: 6px; font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--text2); cursor: pointer;
+  }
+  .nav-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+
+  /* ADMIN PRODUCT ROW */
+  .prod-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: .65rem .5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .prod-row:last-child { border-bottom: none; }
+  .prod-thumb-sm {
+    width: 38px; height: 38px; border-radius: 6px;
+    overflow: hidden; flex-shrink: 0; background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .prod-thumb-sm img { width: 100%; height: 100%; object-fit: cover; }
+  .prod-info { flex: 1; min-width: 0; }
+  .prod-info .pn { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prod-info .pc { font-size: 11px; color: var(--text3); }
+  .prod-price { font-size: 13px; font-weight: 500; color: var(--accent); font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .prod-actions { display: flex; gap: 2px; }
+  .prod-actions button { background: none; border: none; cursor: pointer; padding: 5px; font-size: 16px; border-radius: 6px; }
+  .prod-actions .edit-btn { color: var(--accent); }
+  .prod-actions .del-btn { color: var(--danger); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 1.25rem 1rem 2rem;
+    width: 100%; max-width: 480px;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1rem; }
+  .modal h2 { font-size: 17px; font-weight: 600; margin-bottom: 1rem; }
+  .modal-footer { display: flex; gap: 8px; margin-top: 1rem; }
+  .modal-footer button { flex: 1; margin-top: 0; }
+
+  /* PICKER GRID */
+  .picker-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 300px; overflow-y: auto; margin-bottom: .75rem; }
+  .picker-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: .5rem; cursor: pointer; position: relative;
+    transition: border-color .15s;
+  }
+  .picker-card.selected { border-color: var(--accent); background: var(--accent-light); }
+  .picker-card img { width: 100%; height: 65px; object-fit: cover; border-radius: 6px; }
+  .picker-card .pic-no-img { width: 100%; height: 65px; background: var(--surface2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text3); }
+  .picker-card .pcard-name { font-size: 12px; font-weight: 500; margin-top: 5px; line-height: 1.3; }
+  .picker-card .pcard-cat { font-size: 10px; color: var(--text3); }
+  .picker-check {
+    position: absolute; top: 5px; right: 5px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: none; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+  .picker-card.selected .picker-check { display: flex; }
+
+  /* QTY */
+  .qty-row { display: flex; align-items: center; gap: 10px; padding: .75rem; background: var(--surface2); border-radius: var(--radius-sm); }
+  .qty-label { font-size: 13px; color: var(--text2); flex: 1; }
+  .qty-btn { width: 34px; height: 34px; border: 1px solid var(--border2); border-radius: 8px; background: var(--surface); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); }
+  .qty-val { font-size: 18px; font-weight: 600; min-width: 28px; text-align: center; font-family: 'DM Mono', monospace; }
+
+  /* COT PREVIEW */
+  .cot-header { background: var(--accent); color: #fff; border-radius: var(--radius-sm); padding: .85rem 1rem; margin-bottom: 1rem; }
+  .cot-header .folio { font-family: 'DM Mono', monospace; font-size: 11px; opacity: .7; }
+  .cot-header .cname { font-size: 17px; font-weight: 600; margin-top: 4px; }
+  .cot-header .cdetails { font-size: 12px; opacity: .75; margin-top: 3px; }
+  .cot-item-row { display: flex; align-items: center; gap: 10px; padding: .65rem 0; border-bottom: 1px solid var(--border); }
+  .cot-item-row:last-child { border-bottom: none; }
+  .cot-item-thumb { width: 46px; height: 46px; border-radius: 7px; overflow: hidden; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+  .cot-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .cot-item-name { font-size: 13px; font-weight: 500; }
+  .cot-item-detail { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .cot-total-row { background: var(--accent); color: #fff; border-radius: var(--radius-sm); padding: .85rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: .75rem; }
+  .cot-total-row .ct-label { font-size: 13px; opacity: .75; }
+  .cot-total-row .ct-amount { font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .disc-chip { background: var(--success-light); color: var(--success); font-size: 12px; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: .5rem; }
+
+  /* COT HISTORY */
+  .cot-hist-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: .75rem; margin-bottom: .5rem;
+    box-shadow: var(--shadow);
+  }
+  .cot-hist-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .cot-hist-name { font-weight: 500; font-size: 14px; }
+  .cot-hist-amount { font-weight: 600; color: var(--success); font-family: 'DM Mono', monospace; font-size: 14px; }
+  .cot-hist-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  /* DISCOUNT GRID */
+  .disc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .disc-grid > div { }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff;
+    padding: .65rem 1.25rem; border-radius: 20px;
+    font-size: 13px; font-weight: 500;
+    z-index: 999; box-shadow: var(--shadow-md);
+    opacity: 0; transition: opacity .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- =================== LOGIN =================== -->
+<div id="s-login" class="screen active">
+  <div class="login-hero">
+    <div class="logo-circle"><i class="ti ti-truck"></i></div>
+    <div class="brand">MAP Group</div>
+    <div class="sub">COTIZADOR SPRINTER</div>
+  </div>
+  <div class="login-form">
+    <div class="card">
+      <div class="card-title">Selecciona tu perfil</div>
+      <label>¿Quién eres?</label>
+      <select id="login-role" onchange="toggleAdminPass()">
+        <option value="vendedor">Vendedor</option>
+        <option value="admin">Administrador</option>
+      </select>
+      <div id="admin-pass-wrap" style="display:none">
+        <label>Contraseña de administrador</label>
+        <input type="password" id="login-pass" placeholder="••••••">
+      </div>
+      <button class="btn primary" onclick="doLogin()" style="margin-top:1.25rem">
+        <i class="ti ti-login"></i> Ingresar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== VENDEDOR =================== -->
+<div id="s-vendedor" class="screen">
+  <div class="topbar">
+    <div>
+      <div class="topbar h1" style="font-size:15px;font-weight:500">Nueva cotización</div>
+      <div class="logo-sub">MAP GROUP · SPRINTER</div>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge">Vendedor</span>
+      <button class="icon-btn" onclick="logout()" title="Salir"><i class="ti ti-logout"></i></button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- Cliente -->
+    <div class="card">
+      <div class="card-title">Datos del cliente</div>
+      <label>Nombre completo</label>
+      <input type="text" id="v-cliente" placeholder="Ej. Juan García López">
+      <label>Correo electrónico</label>
+      <input type="email" id="v-correo" placeholder="cliente@empresa.com">
+      <label>Modelo Sprinter</label>
+      <input type="text" id="v-modelo" placeholder="Ej. Sprinter 519 CDI">
+      <label>Configuración</label>
+      <select id="v-config">
+        <option>Estándar</option>
+        <option>Premium</option>
+        <option>Ejecutiva</option>
+        <option>Especial</option>
+        <option>Personalizada</option>
+      </select>
+      <label>Notas adicionales</label>
+      <textarea id="v-notas" placeholder="Requerimientos especiales, observaciones..."></textarea>
+    </div>
+
+    <!-- Items -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <span style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Ítems</span>
+      <button class="btn" style="width:auto;padding:6px 12px;font-size:13px;margin:0" onclick="openPicker()">
+        <i class="ti ti-plus"></i> Agregar
+      </button>
+    </div>
+
+    <div id="v-items-list">
+      <div class="empty"><i class="ti ti-shopping-cart"></i><p>Sin ítems todavía</p></div>
+    </div>
+
+    <div class="total-bar" id="v-total-bar" style="display:none">
+      <div>
+        <div class="tl">Total cotización</div>
+        <div id="v-disc-note" style="font-size:11px;opacity:.7;margin-top:2px"></div>
+      </div>
+      <div class="ta" id="v-total-amount">$0</div>
+    </div>
+
+    <button class="btn success" id="v-gen-btn" onclick="generarCotizacion()" style="display:none">
+      <i class="ti ti-file-check"></i> Generar cotización
+    </button>
+    <button class="btn ghost" onclick="resetCotizacion()">
+      <i class="ti ti-refresh"></i> Limpiar
+    </button>
+  </div>
+</div>
+
+<!-- =================== ADMIN =================== -->
+<div id="s-admin" class="screen">
+  <div class="topbar">
+    <div>
+      <div style="font-size:15px;font-weight:500">Administrador</div>
+      <div class="logo-sub">MAP GROUP · PANEL</div>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge admin-badge">Admin</span>
+      <button class="icon-btn" onclick="logout()" title="Salir"><i class="ti ti-logout"></i></button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="adminTab('productos')">Productos</button>
+      <button class="nav-tab" onclick="adminTab('descuentos')">Descuentos</button>
+      <button class="nav-tab" onclick="adminTab('cotizaciones')">Historial</button>
+    </div>
+
+    <!-- PRODUCTOS TAB -->
+    <div id="tab-productos">
+      <button class="btn primary" onclick="openNuevoProd()">
+        <i class="ti ti-plus"></i> Nuevo producto
+      </button>
+      <div class="card" style="margin-top:.75rem;padding:.5rem .75rem">
+        <div id="admin-prod-list"></div>
+      </div>
+    </div>
+
+    <!-- DESCUENTOS TAB -->
+    <div id="tab-descuentos" style="display:none">
+      <div class="card">
+        <div class="card-title">Descuentos</div>
+        <div class="disc-grid">
+          <div>
+            <label>Descuento general (%)</label>
+            <input type="number" id="disc-global" min="0" max="100" value="0" placeholder="0">
+          </div>
+          <div>
+            <label>Descuento VIP (%)</label>
+            <input type="number" id="disc-vip" min="0" max="100" value="0" placeholder="0">
+          </div>
+        </div>
+        <label>Nota en cotización</label>
+        <input type="text" id="disc-nota" placeholder="Ej. Precios válidos por 30 días">
+        <label>Condiciones de pago</label>
+        <input type="text" id="disc-pago" placeholder="Ej. 50% anticipo, 50% contra entrega">
+        <button class="btn primary" onclick="guardarDescuentos()">
+          <i class="ti ti-device-floppy"></i> Guardar cambios
+        </button>
+      </div>
+    </div>
+
+    <!-- COTIZACIONES TAB -->
+    <div id="tab-cotizaciones" style="display:none">
+      <div id="admin-cots-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODAL PICKER =================== -->
+<div class="modal-overlay" id="modal-picker">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Seleccionar producto</h2>
+    <div class="picker-grid" id="picker-grid"></div>
+    <div class="qty-row" id="picker-qty-row" style="display:none">
+      <span class="qty-label">Cantidad</span>
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <span class="qty-val" id="picker-qty-val">1</span>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+    <div class="modal-footer" style="margin-top:.75rem">
+      <button class="btn" onclick="closePicker()">Cancelar</button>
+      <button class="btn primary" onclick="confirmPicker()">
+        <i class="ti ti-plus"></i> Agregar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODAL PRODUCTO =================== -->
+<div class="modal-overlay" id="modal-prod">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="mprod-title">Nuevo producto</h2>
+    <label>Nombre del producto</label>
+    <input type="text" id="mp-nombre" placeholder="Ej. Asiento capitán premium">
+    <label>Precio (MXN)</label>
+    <input type="number" id="mp-precio" placeholder="0.00" min="0" step="0.01">
+    <label>Categoría</label>
+    <input type="text" id="mp-cat" placeholder="Ej. Asiento, Carrocería, Instalación...">
+    <label>URL de imagen</label>
+    <input type="text" id="mp-img" placeholder="https://..." oninput="updateImgPreview(this.value)">
+    <div id="mp-preview" style="margin-top:8px;height:110px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px">
+      <span><i class="ti ti-photo" style="font-size:24px;display:block;text-align:center;margin-bottom:4px"></i>Vista previa</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeProdModal()">Cancelar</button>
+      <button class="btn primary" onclick="guardarProd()">
+        <i class="ti ti-device-floppy"></i> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODAL COTIZACIÓN =================== -->
+<div class="modal-overlay" id="modal-cot">
+  <div class="modal" style="max-height:90vh">
+    <div class="modal-handle"></div>
+    <h2>Cotización lista</h2>
+    <div id="cot-preview-content"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-cot').classList.remove('open')">Cerrar</button>
+      <button class="btn primary" onclick="copiarCot()">
+        <i class="ti ti-copy"></i> Copiar texto
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== STATE =====================
+const ADMIN_PASS = 'map2024';
+let state = {
+  productos: [],
+  descuentos: { global: 0, vip: 0, nota: '', pago: '' },
+  cotizaciones: [],
+  items: [],
+  pickerSel: null,
+  pickerQty: 1,
+  editingId: null
+};
+
+// ===================== STORAGE =====================
+const SK = 'map_group_v2';
+function loadState() {
+  try {
+    const s = localStorage.getItem(SK);
+    if (s) {
+      const d = JSON.parse(s);
+      state.productos = d.productos || [];
+      state.descuentos = d.descuentos || { global:0, vip:0, nota:'', pago:'' };
+      state.cotizaciones = d.cotizaciones || [];
+    }
+  } catch(e) {}
+  if (!state.productos.length) {
+    state.productos = [
+      { id:1, nombre:'Asiento capitán premium', precio:12500, cat:'Asientos', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80' },
+      { id:2, nombre:'Tapizado lateral interior', precio:8200, cat:'Tapizado', img:'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=300&q=80' },
+      { id:3, nombre:'Panel carrocería frontal', precio:22000, cat:'Carrocería', img:'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=300&q=80' },
+      { id:4, nombre:'Instalación eléctrica completa', precio:6500, cat:'Instalación', img:'https://images.unsplash.com/photo-1565034946487-077786996e27?w=300&q=80' },
+      { id:5, nombre:'Tapicería de asiento trasero', precio:9800, cat:'Tapizado', img:'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=300&q=80' },
+    ];
+  }
+}
+function saveState() {
+  try {
+    localStorage.setItem(SK, JSON.stringify({
+      productos: state.productos,
+      descuentos: state.descuentos,
+      cotizaciones: state.cotizaciones
+    }));
+  } catch(e) {}
+}
+
+// ===================== UTILS =====================
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function fmt(n) { return '$' + Math.round(n).toLocaleString('es-MX'); }
+
+// ===================== LOGIN =====================
+function toggleAdminPass() {
+  const r = document.getElementById('login-role').value;
+  document.getElementById('admin-pass-wrap').style.display = r === 'admin' ? 'block' : 'none';
+}
+function doLogin() {
+  const role = document.getElementById('login-role').value;
+  if (role === 'admin') {
+    if (document.getElementById('login-pass').value !== ADMIN_PASS) {
+      toast('Contraseña incorrecta'); return;
+    }
+  }
+  if (role === 'vendedor') { show('s-vendedor'); renderItems(); }
+  else { show('s-admin'); renderAdminProds(); loadDescUI(); renderAdminCots(); }
+}
+function logout() {
+  state.items = [];
+  document.getElementById('login-pass').value = '';
+  show('s-login');
+}
+
+// ===================== VENDEDOR =====================
+function renderItems() {
+  const list = document.getElementById('v-items-list');
+  const tb = document.getElementById('v-total-bar');
+  const gb = document.getElementById('v-gen-btn');
+  if (!state.items.length) {
+    list.innerHTML = '<div class="empty"><i class="ti ti-shopping-cart"></i><p>Sin ítems todavía</p></div>';
+    tb.style.display = 'none'; gb.style.display = 'none'; return;
+  }
+  list.innerHTML = state.items.map((it, i) => `
+    <div class="item-row">
+      <div class="item-thumb">
+        ${it.img ? `<img src="${it.img}" alt="">` : `<i class="ti ti-box" style="font-size:20px;color:var(--text3)"></i>`}
+      </div>
+      <div class="item-info">
+        <div class="item-name">${it.nombre}</div>
+        <div class="item-qty">${it.cat} · Cant: ${it.qty}</div>
+      </div>
+      <button class="item-del" onclick="removeItem(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+  const sub = state.items.reduce((s,it) => s + it.precio * it.qty, 0);
+  const disc = state.descuentos.global || 0;
+  const total = sub * (1 - disc / 100);
+  tb.style.display = 'flex'; gb.style.display = 'flex';
+  document.getElementById('v-total-amount').textContent = fmt(total);
+  document.getElementById('v-disc-note').textContent = disc > 0 ? `Descuento ${disc}% incluido` : '';
+}
+function removeItem(i) { state.items.splice(i, 1); renderItems(); }
+function resetCotizacion() {
+  state.items = [];
+  ['v-cliente','v-correo','v-modelo','v-notas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('v-config').selectedIndex = 0;
+  renderItems();
+}
+
+// PICKER
+function openPicker() {
+  state.pickerSel = null; state.pickerQty = 1;
+  document.getElementById('picker-qty-row').style.display = 'none';
+  document.getElementById('picker-grid').innerHTML = state.productos.map(p => `
+    <div class="picker-card" id="pc-${p.id}" onclick="selectProd(${p.id})">
+      ${p.img ? `<img src="${p.img}" alt="">` : `<div class="pic-no-img"><i class="ti ti-box"></i></div>`}
+      <div class="pcard-name">${p.nombre}</div>
+      <div class="pcard-cat">${p.cat}</div>
+      <div class="picker-check"><i class="ti ti-check"></i></div>
+    </div>`).join('');
+  document.getElementById('modal-picker').classList.add('open');
+}
+function selectProd(id) {
+  document.querySelectorAll('.picker-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('pc-'+id).classList.add('selected');
+  state.pickerSel = id; state.pickerQty = 1;
+  document.getElementById('picker-qty-val').textContent = 1;
+  document.getElementById('picker-qty-row').style.display = 'flex';
+}
+function changeQty(d) {
+  state.pickerQty = Math.max(1, state.pickerQty + d);
+  document.getElementById('picker-qty-val').textContent = state.pickerQty;
+}
+function closePicker() { document.getElementById('modal-picker').classList.remove('open'); }
+function confirmPicker() {
+  if (!state.pickerSel) { toast('Selecciona un producto'); return; }
+  const p = state.productos.find(x => x.id === state.pickerSel);
+  state.items.push({ ...p, qty: state.pickerQty });
+  closePicker(); renderItems();
+}
+
+// GENERAR
+function generarCotizacion() {
+  const cliente = document.getElementById('v-cliente').value.trim();
+  const correo  = document.getElementById('v-correo').value.trim();
+  const modelo  = document.getElementById('v-modelo').value.trim();
+  const config  = document.getElementById('v-config').value;
+  const notas   = document.getElementById('v-notas').value.trim();
+  if (!cliente) { toast('Escribe el nombre del cliente'); return; }
+  if (!state.items.length) { toast('Agrega al menos un ítem'); return; }
+
+  const sub  = state.items.reduce((s,it) => s + it.precio * it.qty, 0);
+  const disc = state.descuentos.global || 0;
+  const total = Math.round(sub * (1 - disc / 100));
+  const folio = 'COT-' + Date.now().toString().slice(-6);
+  const fecha = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
+
+  const cot = { folio, fecha, cliente, correo, modelo, config, notas, items: [...state.items], total, disc };
+  state.cotizaciones.unshift(cot);
+  saveState();
+
+  const itemsHtml = state.items.map(it => `
+    <div class="cot-item-row">
+      <div class="cot-item-thumb">
+        ${it.img ? `<img src="${it.img}" alt="">` : `<i class="ti ti-box" style="font-size:20px;color:var(--text3)"></i>`}
+      </div>
+      <div>
+        <div class="cot-item-name">${it.nombre}</div>
+        <div class="cot-item-detail">${it.cat} · Cantidad: ${it.qty}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('cot-preview-content').innerHTML = `
+    <div class="cot-header">
+      <div class="folio">${folio} · ${fecha}</div>
+      <div class="cname">${cliente}</div>
+      <div class="cdetails">${correo ? correo + ' · ' : ''}${modelo} · ${config}</div>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Productos incluidos</div>
+    <div>${itemsHtml}</div>
+    ${disc > 0 ? `<div style="margin-top:.75rem"><span class="disc-chip"><i class="ti ti-tag"></i> Descuento ${disc}% aplicado</span></div>` : ''}
+    <div class="cot-total-row">
+      <div class="ct-label">Total cotización</div>
+      <div class="ct-amount">${fmt(total)}</div>
+    </div>
+    ${state.descuentos.nota ? `<p style="font-size:12px;color:var(--text2);margin-top:.6rem"><i class="ti ti-info-circle"></i> ${state.descuentos.nota}</p>` : ''}
+    ${state.descuentos.pago ? `<p style="font-size:12px;color:var(--text2);margin-top:.3rem"><i class="ti ti-credit-card"></i> ${state.descuentos.pago}</p>` : ''}
+    ${notas ? `<p style="font-size:12px;color:var(--text2);margin-top:.3rem;padding:.6rem;background:var(--surface2);border-radius:6px">📝 ${notas}</p>` : ''}
+  `;
+  document.getElementById('modal-cot').classList.add('open');
+}
+
+function copiarCot() {
+  const txt = document.getElementById('cot-preview-content').innerText;
+  navigator.clipboard.writeText(txt).then(() => toast('Copiado al portapapeles ✓'));
+}
+
+// ===================== ADMIN =====================
+function adminTab(tab) {
+  ['productos','descuentos','cotizaciones'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((b,i) => {
+    b.classList.toggle('active', ['productos','descuentos','cotizaciones'][i] === tab);
+  });
+  if (tab === 'cotizaciones') renderAdminCots();
+}
+
+function renderAdminProds() {
+  const el = document.getElementById('admin-prod-list');
+  if (!state.productos.length) {
+    el.innerHTML = '<div class="empty" style="padding:1.5rem"><i class="ti ti-box-off"></i><p>Sin productos</p></div>'; return;
+  }
+  el.innerHTML = state.productos.map(p => `
+    <div class="prod-row">
+      <div class="prod-thumb-sm">
+        ${p.img ? `<img src="${p.img}" alt="">` : `<i class="ti ti-box" style="font-size:16px;color:var(--text3)"></i>`}
+      </div>
+      <div class="prod-info">
+        <div class="pn">${p.nombre}</div>
+        <div class="pc">${p.cat}</div>
+      </div>
+      <div class="prod-price">${fmt(p.precio)}</div>
+      <div class="prod-actions">
+        <button class="edit-btn" onclick="editProd(${p.id})"><i class="ti ti-pencil"></i></button>
+        <button class="del-btn" onclick="delProd(${p.id})"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function openNuevoProd() {
+  state.editingId = null;
+  document.getElementById('mprod-title').textContent = 'Nuevo producto';
+  ['mp-nombre','mp-precio','mp-cat','mp-img'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mp-preview').innerHTML = '<span><i class="ti ti-photo" style="font-size:24px;display:block;text-align:center;margin-bottom:4px"></i>Vista previa</span>';
+  document.getElementById('modal-prod').classList.add('open');
+}
+function editProd(id) {
+  const p = state.productos.find(x => x.id === id);
+  state.editingId = id;
+  document.getElementById('mprod-title').textContent = 'Editar producto';
+  document.getElementById('mp-nombre').value = p.nombre;
+  document.getElementById('mp-precio').value = p.precio;
+  document.getElementById('mp-cat').value = p.cat;
+  document.getElementById('mp-img').value = p.img || '';
+  updateImgPreview(p.img);
+  document.getElementById('modal-prod').classList.add('open');
+}
+function closeProdModal() { document.getElementById('modal-prod').classList.remove('open'); }
+function updateImgPreview(url) {
+  const el = document.getElementById('mp-preview');
+  if (url) el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='URL no válida'">`;
+  else el.innerHTML = '<span><i class="ti ti-photo" style="font-size:24px;display:block;text-align:center;margin-bottom:4px"></i>Vista previa</span>';
+}
+function guardarProd() {
+  const nombre = document.getElementById('mp-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('mp-precio').value);
+  const cat    = document.getElementById('mp-cat').value.trim();
+  const img    = document.getElementById('mp-img').value.trim();
+  if (!nombre || isNaN(precio)) { toast('Nombre y precio son requeridos'); return; }
+  if (state.editingId) {
+    Object.assign(state.productos.find(p => p.id === state.editingId), { nombre, precio, cat, img });
+  } else {
+    state.productos.push({ id: Date.now(), nombre, precio, cat, img });
+  }
+  saveState(); closeProdModal(); renderAdminProds(); toast('Producto guardado ✓');
+}
+function delProd(id) {
+  if (!confirm('¿Eliminar este producto del catálogo?')) return;
+  state.productos = state.productos.filter(p => p.id !== id);
+  saveState(); renderAdminProds(); toast('Eliminado');
+}
+
+function loadDescUI() {
+  document.getElementById('disc-global').value = state.descuentos.global;
+  document.getElementById('disc-vip').value    = state.descuentos.vip;
+  document.getElementById('disc-nota').value   = state.descuentos.nota;
+  document.getElementById('disc-pago').value   = state.descuentos.pago || '';
+}
+function guardarDescuentos() {
+  state.descuentos.global = parseFloat(document.getElementById('disc-global').value) || 0;
+  state.descuentos.vip    = parseFloat(document.getElementById('disc-vip').value) || 0;
+  state.descuentos.nota   = document.getElementById('disc-nota').value.trim();
+  state.descuentos.pago   = document.getElementById('disc-pago').value.trim();
+  saveState(); toast('Descuentos guardados ✓');
+}
+
+function renderAdminCots() {
+  const el = document.getElementById('admin-cots-list');
+  if (!state.cotizaciones.length) {
+    el.innerHTML = '<div class="empty"><i class="ti ti-clipboard-list"></i><p>Sin cotizaciones aún</p></div>'; return;
+  }
+  el.innerHTML = state.cotizaciones.map(c => `
+    <div class="cot-hist-card">
+      <div class="cot-hist-top">
+        <div class="cot-hist-name">${c.cliente}</div>
+        <div class="cot-hist-amount">${fmt(c.total)}</div>
+      </div>
+      <div class="cot-hist-meta">${c.folio} · ${c.fecha} · ${c.modelo}</div>
+      <div class="cot-hist-meta" style="margin-top:2px">${c.items.length} ítem(s) · Config: ${c.config}${c.disc > 0 ? ' · Desc. '+c.disc+'%' : ''}</div>
+      ${c.correo ? `<div class="cot-hist-meta" style="margin-top:2px;color:var(--accent)">${c.correo}</div>` : ''}
+    </div>`).join('');
+}
+
+// Init
+loadState();
+</script>
+</body>
+</html>
